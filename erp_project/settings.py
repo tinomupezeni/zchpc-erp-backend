@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     'django_browser_reload',
 ]
 
-TAILWIND_APP_NAME = "erptheme"
-
 INTERNAL_IPS = ["127.0.0.1"]
 
 MIDDLEWARE = [
@@ -89,7 +87,7 @@ WSGI_APPLICATION = 'erp_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'erp',
+        'NAME': 'erp_db',
         'USER': 'tino',
         'PASSWORD': 'tino',
         'HOST': 'localhost',

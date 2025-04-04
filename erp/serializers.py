@@ -1,59 +1,81 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from ZCHPC_ERP.erp_project.erp.models import Employee
-
-User = get_user_model()
+from .models import CustomUser, Employees
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['email', 'firstname', 'surname', 'role', 'employeeid', 'password']
+        model = CustomUser
+        fields = ['email', 'employeeid', 'firstname', 'isActive', 'surname', 'role', 'department', 'password', 'salary', 'contractFrom', 'contractTo']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_email(self, value):
-        """Ensure email is unique."""
-        if User.objects.filter(email=value).exists():
+        if CustomUser.objects.filter(email=value).exists():
             raise serializers.ValidationError("This email is already in use.")
         return value
 
-    def validate_employeeid(self, value):
-        """Ensure employee ID is unique."""
-        if User.objects.filter(employeeid=value).exists():
-            raise serializers.ValidationError("This Employee ID is already in use.")
-        return value
-
     def create(self, validated_data):
-        """Create a new user with a default password."""
-        # Use email as the username
         validated_data['username'] = validated_data['email']
-        
-        # Create the user
-        user = User.objects.create_user(
+        user = CustomUser.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
-            password=validated_data['password'],  # Password will be hashed automatically
+            password=validated_data['password'],
             firstname=validated_data.get('firstname', ''),
             surname=validated_data.get('surname', ''),
             role=validated_data.get('role', ''),
-            employeeid=validated_data.get('employeeid', '')
+            department=validated_data.get('department', ''),
+            salary=validated_data.get('salary', None),
+            contractFrom=validated_data.get('contractFrom', None),
+            contractTo=validated_data.get('contractTo', None),
         )
         return user
     
-    def create_employee(self, validated_data):
-        """Create a new user with a default password."""
-        # Use email as the username
-        validated_data['username'] = validated_data['email']
-        
-        # Create the user
-        user = Employee.objects.create(
-            username=validated_data['username'],
+class EmployeeRegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employees
+        fields = ['email', 'employeeid', 'firstname', 'isActive', 'surname', 'position', 'department',  'usd_salary', 'zig_salary', 'contractFrom', 'contractTo', 'phone']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate_email(self, value):
+        if Employees.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
+
+    def create(self, validated_data):
+        user = Employees.objects.create(
             email=validated_data['email'],
-            password=validated_data['password'],  # Password will be hashed automatically
             firstname=validated_data.get('firstname', ''),
             surname=validated_data.get('surname', ''),
+            position=validated_data.get('position', ''),
             department=validated_data.get('department', ''),
-            employeeid=validated_data.get('employeeid', ''),
-            contractFrom=validated_data.get('contractFrom', ''),
-            contractTo=validated_data.get('contractTo', ''),
+            phone = validated_data.get('phone', ''),
+            usd_salary=validated_data.get('usd_salary', None),
+            zig_salary=validated_data.get('zig_salary', None),
+            contractFrom=validated_data.get('contractFrom', None),
+            contractTo=validated_data.get('contractTo', None),
+        )
+        return user
+    
+class EmployeePayslipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employees
+        fields = ['employeeid', 'firstname', 'isActive', 'surname', 'position', 'department',  'contractFrom', 'contractTo', 'phone', 'usd_salary', 'zig_salary']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate_email(self, value):
+        if Employees.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
+
+    def create(self, validated_data):
+        user = Employees.objects.create(
+            email=validated_data['email'],
+            firstname=validated_data.get('firstname', ''),
+            surname=validated_data.get('surname', ''),
+            position=validated_data.get('position', ''),
+            department=validated_data.get('department', ''),
+            phone = validated_data.get('phone', ''),
+            usd_salary=validated_data.get('usd_salary', None),
+            zig_salary=validated_data.get('zig_salary', None),
+            contractFrom=validated_data.get('contractFrom', None),
+            contractTo=validated_data.get('contractTo', None),
         )
         return user
